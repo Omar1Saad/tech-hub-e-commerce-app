@@ -13,7 +13,10 @@ import {
   Pagination,
   Stack
 } from '@mui/material';
+import TocIcon from '@mui/icons-material/Toc';
+import WindowIcon from '@mui/icons-material/Window';
 import { ShoppingCart } from '@mui/icons-material';
+import { useNavigate  } from 'react-router';
 import api from '../utils/axios';
 
 const Products = () => {
@@ -23,8 +26,14 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(6);
+  const [isGrid, setIsGrid] = useState(true);
+  const navigate = useNavigate()
 
   useEffect(() => {
+    const savedIsGrid = localStorage.getItem('isGrid');
+    if (savedIsGrid) {
+      setIsGrid(JSON.parse(savedIsGrid));
+    }
     fetchProducts();
   }, []);
 
@@ -74,6 +83,12 @@ const Products = () => {
     localStorage.setItem('cart', JSON.stringify(cart));
   };
 
+  const toggleIsGrid = () => {
+    const newState = !isGrid;
+    setIsGrid(newState);
+    localStorage.setItem('isGrid', JSON.stringify(newState));
+  };
+
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -107,10 +122,14 @@ const Products = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           sx={{ mb: 3 }}
         />
-
-        <Grid container spacing={3}>
+        {isGrid?(
+          <>
+          <Button  variant='contained' sx={{mb:3}} onClick={toggleIsGrid} >
+           <TocIcon/>
+          </Button>
+          <Grid container spacing={3}>
           {currentProducts.map((product) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={product.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={product.id} >
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardMedia
                   component="img"
@@ -118,8 +137,9 @@ const Products = () => {
                   image={product.image}
                   alt={product.title}
                 />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" gutterBottom>
+                <CardContent >
+                  <Typography sx={{ flexGrow: 1 ,transition:'200ms' , ':hover':{cursor:'pointer', textDecoration:'underline'} }}
+                   onClick={()=> navigate(`/product/${product.id}`,{state:product})} variant="h6" gutterBottom>
                     {product.title.length > 50 
                       ? `${product.title.substring(0, 50)}...` 
                       : product.title
@@ -147,7 +167,7 @@ const Products = () => {
                     variant="contained"
                     fullWidth
                     startIcon={<ShoppingCart />}
-                    onClick={() => addToCart(product)}
+                    onClick={(e) => addToCart(product)}
                   >
                     Add to Cart
                   </Button>
@@ -156,6 +176,65 @@ const Products = () => {
             </Grid>
           ))}
         </Grid>
+        </>):(
+          <>
+            <Button variant='contained' sx={{mb:3}} onClick={toggleIsGrid} >
+              <WindowIcon/>
+            </Button>
+            <Stack   direction="column"
+            spacing={4}
+            sx={{
+              justifyContent: "flex-start",
+              alignItems: "stretch",
+            }}>
+            {currentProducts.map((product) => (
+              <Card sx={{display: 'flex' }} key={product.id} >
+                <CardMedia
+                  sx={{ minWidth:'20%', maxWidth:'30%', m:'auto'}}
+                  component="img"
+                  image={product.image}
+                  alt={product.title}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography sx={{ flexGrow: 1 ,transition:'200ms' , ':hover':{cursor:'pointer', textDecoration:'underline'} }}
+                   onClick={()=> navigate(`/product/${product.id}`)} variant="h6" gutterBottom>
+                    {product.title.length > 50 
+                      ? `${product.title.substring(0, 50)}...` 
+                      : product.title
+                    }
+                  </Typography>
+                  
+                  <Chip 
+                    label={product.category} 
+                    size="small" 
+                    sx={{ mb: 1 }} 
+                  />
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {product.description.length > 100 
+                      ? `${product.description.substring(0, 100)}...` 
+                      : product.description
+                    }
+                  </Typography>
+                  
+                  <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+                    ${product.price}
+                  </Typography>
+                  
+                  <Button
+                    variant="contained"
+                    startIcon={<ShoppingCart />}
+                    onClick={() => addToCart(product)}
+                  >
+                    Add to Cart
+                  </Button>
+                </CardContent>
+              </Card>
+          ))}
+            </Stack>
+          </>
+        )}
+        
 
         {totalPages > 1 && (
           <Stack spacing={2} alignItems="center" sx={{ mt: 4 }}>

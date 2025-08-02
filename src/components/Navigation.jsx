@@ -29,7 +29,8 @@ const Navigation = () => {
     };
 
     updateCartCount();
-    
+
+
     const interval = setInterval(updateCartCount, 1000);
     return () => clearInterval(interval);
   }, []);

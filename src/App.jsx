@@ -6,6 +6,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 import Navigation from './components/Navigation';
 import Login from './components/Login';
 import Products from './components/Products';
+import Product from './components/Product';
 import Users from './components/Users';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
@@ -19,11 +20,11 @@ const AppContent = () => {
     palette: {
       mode: darkMode ? 'dark' : 'light',
       primary: {
-        main: '#CCDC28',
+        main:  darkMode? '#00a05dff': '#1976d2',
         contrastText: '#000000',
       },
       secondary: {
-        main: darkMode ? '#CCDC28' : '#1976d2',
+        main: darkMode ? '#00a05dff' : '#1976d2',
       },
       background: {
         default: darkMode ? '#121212' : '#ffffff',
@@ -34,10 +35,10 @@ const AppContent = () => {
       MuiButton: {
         styleOverrides: {
           contained: {
-            backgroundColor: '#CCDC28',
-            color: '#000000',
+            backgroundColor: darkMode? '#00a05dff': '#1976d2',
+            color: darkMode? '#ffffffff': '#000000ff',
             '&:hover': {
-              backgroundColor: '#b8c424',
+              backgroundColor: darkMode? '#006139ff': '#1976d2',
             },
           },
         },
@@ -45,7 +46,7 @@ const AppContent = () => {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            backgroundColor: darkMode ? '#1e1e1e' : '#CCDC28',
+            backgroundColor: darkMode ? '#00a05dff' : '#1976d2',
             color: darkMode ? '#ffffff' : '#000000',
           },
         },
@@ -62,6 +63,7 @@ const AppContent = () => {
           <ProtectedRoute>
             <Routes>
               <Route path="/products" element={<Products />} />
+              <Route path="/product/:id" element={<Product />} />
               <Route path="/users" element={<Users />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
